@@ -1,18 +1,37 @@
 {
   "name": "market",
+  "version": "0.1.0",
   "private": true,
   "workspaces": [
-    "apps/*",
     "packages/*"
   ],
   "scripts": {
-    "dev": "npm run dev -w @market/web",
-    "build": "npm run build -w @market/web",
-    "lint": "npm run lint -w @market/web",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
     "test": "npm test -w @market/data",
-    "format": "prettier --write \"apps/web/src/**/*.{ts,tsx,css}\" \"packages/**/*.ts\""
+    "format": "prettier --write \"src/**/*.{ts,tsx,css}\" \"packages/**/*.ts\""
+  },
+  "dependencies": {
+    "@market/contracts": "*",
+    "@market/data": "*",
+    "@phosphor-icons/react": "^2.1.10",
+    "motion": "^12.23.24",
+    "next": "16.4.2",
+    "next-intl": "^4.4.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
   },
   "devDependencies": {
-    "prettier": "^3.6.2"
+    "@tailwindcss/turbopack": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.4.2",
+    "prettier": "^3.6.2",
+    "tailwindcss": "^4",
+    "typescript": "^5"
   }
 }

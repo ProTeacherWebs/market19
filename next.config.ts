@@ -3,16 +3,15 @@ import { fileURLToPath } from "node:url";
 import type { NextConfig } from "next";
 
 const appDir = path.dirname(fileURLToPath(import.meta.url));
-const repoRoot = path.join(appDir, "../..");
 
 const nextConfig: NextConfig = {
   transpilePackages: ["@market/contracts", "@market/data"],
   turbopack: {
-    root: repoRoot,
+    root: appDir,
     resolveAlias: {
       "next-intl/config": "./src/i18n/request.ts",
-      "@market/contracts": "../../packages/contracts/src/index.ts",
-      "@market/data": "../../packages/data/src/index.ts",
+      "@market/contracts": "./packages/contracts/src/index.ts",
+      "@market/data": "./packages/data/src/index.ts",
     },
     rules: {
       "*.css": {

@@ -4,6 +4,9 @@ dist
 coverage
 .turbo
 *.log
+*.tsbuildinfo
+.vercel
+apps
 .env
 .env.*
 !.env.example
