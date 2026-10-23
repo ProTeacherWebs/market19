@@ -1,0 +1,152 @@
+{
+  "meta": {
+    "title": "Velin, demonstration electronics shop",
+    "description": "Phones, computers, and home appliances. Prices in UZS, catalog is a demonstration."
+  },
+  "nav": {
+    "catalog": "Catalog",
+    "search": "Search",
+    "searchPlaceholder": "Model name",
+    "menu": "Menu",
+    "close": "Close",
+    "home": "Velin",
+    "skip": "Skip to content",
+    "account": "Account"
+  },
+  "hero": {
+    "title": "Phones and home appliances",
+    "text": "A demonstration catalog with prices in UZS. Open a model and check the sample stock.",
+    "cta": "Browse phones",
+    "imageAlt": "A phone on a dark background, demonstration photo"
+  },
+  "product": {
+    "demoPrice": "Demo price",
+    "inStock": "In stock",
+    "outOfStock": "Out of stock",
+    "from": "from",
+    "photoAlt": "Demonstration photo: {title}",
+    "variants": "Configurations",
+    "specs": "Specifications",
+    "back": "Back to category",
+    "delivery": "Delivery for demo orders will be described later.",
+    "warranty": "Warranty periods are omitted on demonstration cards.",
+    "favorite": "Save to favorites",
+    "favoriteLogin": "Sign in to save"
+  },
+  "catalog": {
+    "empty": "This category has no published products yet.",
+    "sort": "Sort",
+    "sortNew": "Newest",
+    "sortAsc": "Price, low to high",
+    "sortDesc": "Price, high to low",
+    "count": "{count} products",
+    "brand": "Brand",
+    "allBrands": "All brands",
+    "inStock": "In stock only",
+    "prev": "Previous",
+    "next": "Next",
+    "page": "Pages"
+  },
+  "search": {
+    "title": "Search",
+    "empty": "Nothing matched “{query}”. Check the model name.",
+    "prompt": "Enter a model name.",
+    "try": "Similar names"
+  },
+  "compare": {
+    "title": "Compare",
+    "hint": "Compare 2 to 4 products from one category. The list stays in this browser.",
+    "empty": "Add products from a model page.",
+    "mismatch": "Compare products from one category only.",
+    "feature": "Feature",
+    "brand": "Brand",
+    "stock": "Stock",
+    "add": "Add to compare",
+    "remove": "Remove",
+    "open": "Compare ({count})",
+    "limit": "No more than four models."
+  },
+  "auth": {
+    "loginTitle": "Sign in",
+    "registerTitle": "Create account",
+    "resetTitle": "New password",
+    "resetText": "The password changes in the demo store. No email is sent.",
+    "email": "Email",
+    "password": "Password",
+    "newPassword": "New password",
+    "name": "Name",
+    "login": "Sign in",
+    "register": "Create account",
+    "reset": "Save password",
+    "google": "Continue with Google",
+    "googleHint": "Google OAuth appears after keys are configured. This button does not sign you in yet.",
+    "toRegister": "Create account",
+    "toLogin": "Already have an account",
+    "toReset": "Forgot password",
+    "invalid": "Wrong email or password.",
+    "taken": "This email is already taken.",
+    "passwordShort": "Password must be at least 6 characters.",
+    "missing": "No account with this email.",
+    "resetOk": "Password updated. Sign in again."
+  },
+  "account": {
+    "title": "Account",
+    "overview": "Overview",
+    "profile": "Profile",
+    "orders": "Orders",
+    "addresses": "Addresses",
+    "favorites": "Favorites",
+    "logout": "Sign out",
+    "name": "Name",
+    "phone": "Phone",
+    "newPassword": "New password",
+    "save": "Save",
+    "saved": "Profile saved.",
+    "verify": "Confirm email",
+    "verifyHint": "Email is not confirmed yet. In the demo this is one button.",
+    "verifiedOk": "Email confirmed.",
+    "avatarHint": "Avatar upload is not connected yet. The first letter of the name is shown.",
+    "ordersEmpty": "No orders yet. Checkout arrives in the next stage.",
+    "addressesEmpty": "No addresses yet.",
+    "favoritesEmpty": "Favorites is empty.",
+    "addAddress": "New address",
+    "recipient": "Recipient",
+    "city": "City",
+    "street": "Street and building",
+    "defaultAddress": "Default address",
+    "status": "Status"
+  },
+  "demo": {
+    "open": "About this demo catalog",
+    "title": "This catalog is a demonstration",
+    "text": "Prices, stock, and photos are samples. A photo is shared by the category and is not a picture of that exact model. Checkout and payment come in later stages.",
+    "close": "Close"
+  },
+  "callback": {
+    "title": "Tell us which model you want",
+    "text": "The address stays in this browser only. The shop inbox is not connected.",
+    "label": "Email",
+    "submit": "Save address",
+    "toast": "Address saved in this browser.",
+    "invalid": "Enter a complete email address."
+  },
+  "footer": {
+    "note": "Velin is a demonstration shop. This is not a public offer.",
+    "shop": "Shop",
+    "service": "Service",
+    "about": "About",
+    "delivery": "Delivery",
+    "warranty": "Warranty",
+    "returns": "Returns",
+    "faq": "Questions",
+    "contacts": "Contacts"
+  },
+  "info": {
+    "about": "Velin is a demonstration catalog of phones, computers, and home appliances. The range and prices are samples.",
+    "delivery": "Delivery terms will be published when the shop ships real orders. Checkout is not available yet.",
+    "warranty": "Warranty periods are omitted because the products are demonstrations.",
+    "returns": "Return rules will be published before the first sale.",
+    "faq": "The catalog runs on sample data. The database, account, and payment connect in later stages.",
+    "contacts": "A shop contact address is not assigned yet. The form on the home page stores an email only in the browser."
+  }
+}
