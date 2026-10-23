@@ -11,7 +11,8 @@
     "start": "next start",
     "lint": "eslint",
     "test": "npm test -w @market/data",
-    "format": "prettier --write \"src/**/*.{ts,tsx,css}\" \"packages/**/*.ts\""
+    "format": "prettier --write \"src/**/*.{ts,tsx,css}\" \"packages/**/*.ts\"",
+    "db:generate": "echo Install drizzle-orm drizzle-kit @neondatabase/serverless before migrate. See README."
   },
   "dependencies": {
     "@market/contracts": "*",

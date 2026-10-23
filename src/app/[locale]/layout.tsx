@@ -33,7 +33,21 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "meta" });
-  return { title: t("title"), description: t("description") };
+  const languages = Object.fromEntries(routing.locales.map((item) => [item, `/${item}`]));
+  return {
+    title: t("title"),
+    description: t("description"),
+    alternates: {
+      canonical: `/${locale}`,
+      languages: { ...languages, "x-default": "/ru" },
+    },
+    openGraph: {
+      title: t("title"),
+      description: t("description"),
+      locale,
+      type: "website",
+    },
+  };
 }
 
 export default async function LocaleLayout({
@@ -48,6 +62,7 @@ export default async function LocaleLayout({
   setRequestLocale(locale);
   const messages = await getMessages();
   const t = await getTranslations("nav");
+  const tDemo = await getTranslations("demo");
   const categories = await catalogRepository.listCategories(locale);
   const user = await getSessionUser();
 
@@ -59,6 +74,7 @@ export default async function LocaleLayout({
             <a className="skip" href="#content">
               {t("skip")}
             </a>
+            <p className="border-b border-line bg-raised px-4 py-2 text-center text-sm text-muted">{tDemo("banner")}</p>
             <SiteHeader locale={locale} categories={categories} user={user} />
             <main id="content" className="mx-auto max-w-7xl px-4">
               {children}

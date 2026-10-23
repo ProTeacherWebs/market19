@@ -11,7 +11,9 @@
     "close": "Close",
     "home": "Velin",
     "skip": "Skip to content",
-    "account": "Account"
+    "account": "Account",
+    "cart": "Cart",
+    "admin": "Admin"
   },
   "hero": {
     "title": "Phones and home appliances",
@@ -31,7 +33,43 @@
     "delivery": "Delivery for demo orders will be described later.",
     "warranty": "Warranty periods are omitted on demonstration cards.",
     "favorite": "Save to favorites",
-    "favoriteLogin": "Sign in to save"
+    "favoriteOn": "Saved",
+    "favoriteLogin": "Sign in to save",
+    "addToCart": "Add to cart",
+    "qty": "Qty"
+  },
+  "cart": {
+    "title": "Cart",
+    "empty": "Cart is empty. Add a product from a model page.",
+    "qty": "Quantity",
+    "update": "Update",
+    "remove": "Remove",
+    "total": "Total",
+    "recalc": "Totals use server demo prices.",
+    "checkout": "Place demo order",
+    "errorEmpty": "Add products before checkout.",
+    "errorVariant": "This variant is unavailable."
+  },
+  "checkout": {
+    "title": "Checkout",
+    "demoNote": "Demonstration order. Cash on delivery is not charged.",
+    "contact": "Email",
+    "recipient": "Recipient",
+    "phone": "Phone",
+    "city": "City",
+    "street": "Street and building",
+    "payment": "Method: cash on delivery / demonstration order.",
+    "submit": "Confirm order",
+    "back": "Back to cart",
+    "total": "Total",
+    "errorFields": "Fill in every field.",
+    "errorStock": "Not enough demo stock. Refresh the cart.",
+    "errorOrder": "Could not create the order.",
+    "successTitle": "Order accepted",
+    "successText": "Order number {number}. This is a demo; no payment.",
+    "status": "Status",
+    "openOrder": "Open order",
+    "home": "Home"
   },
   "catalog": {
     "empty": "This category has no published products yet.",
@@ -106,7 +144,7 @@
     "verifyHint": "Email is not confirmed yet. In the demo this is one button.",
     "verifiedOk": "Email confirmed.",
     "avatarHint": "Avatar upload is not connected yet. The first letter of the name is shown.",
-    "ordersEmpty": "No orders yet. Checkout arrives in the next stage.",
+    "ordersEmpty": "No orders yet.",
     "addressesEmpty": "No addresses yet.",
     "favoritesEmpty": "Favorites is empty.",
     "addAddress": "New address",
@@ -116,10 +154,36 @@
     "defaultAddress": "Default address",
     "status": "Status"
   },
+  "admin": {
+    "title": "Admin",
+    "demo": "Demo admin on mocks. Only admin@velin.demo has the admin role.",
+    "overview": "Overview",
+    "products": "Products",
+    "orders": "Orders",
+    "promos": "Promos",
+    "drafts": "Drafts",
+    "ordersEmpty": "No orders.",
+    "colTitle": "Product",
+    "colStatus": "Status",
+    "colStock": "Stock",
+    "colPrice": "Price",
+    "colActions": "Actions",
+    "save": "Save",
+    "publish": "Publish",
+    "unpublish": "Unpublish",
+    "createProduct": "New product",
+    "brand": "Brand",
+    "category": "Category",
+    "total": "Total",
+    "events": "Log",
+    "note": "Note",
+    "statusError": "That status change is not allowed."
+  },
   "demo": {
     "open": "About this demo catalog",
     "title": "This catalog is a demonstration",
-    "text": "Prices, stock, and photos are samples. A photo is shared by the category and is not a picture of that exact model. Checkout and payment come in later stages.",
+    "text": "Prices, stock, and photos are samples. Category photos are shared. Demo orders do not charge money.",
+    "banner": "Demo mode: catalog and orders use mocks, no real payment.",
     "close": "Close"
   },
   "callback": {
@@ -143,10 +207,10 @@
   },
   "info": {
     "about": "Velin is a demonstration catalog of phones, computers, and home appliances. The range and prices are samples.",
-    "delivery": "Delivery terms will be published when the shop ships real orders. Checkout is not available yet.",
+    "delivery": "Demo orders are not shipped. Delivery terms will appear before real sales.",
     "warranty": "Warranty periods are omitted because the products are demonstrations.",
     "returns": "Return rules will be published before the first sale.",
-    "faq": "The catalog runs on sample data. The database, account, and payment connect in later stages.",
+    "faq": "Catalog and account use mocks. Neon and payments come next.",
     "contacts": "A shop contact address is not assigned yet. The form on the home page stores an email only in the browser."
   }
 }

@@ -3,6 +3,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { userRepository } from "@market/data";
+import { mergeGuestCartIntoUser } from "./cart";
 import { SESSION_COOKIE } from "./session";
 
 async function setSession(userId: string) {
@@ -29,6 +30,7 @@ export async function loginAction(formData: FormData) {
     redirect(`/${locale}/account/login?error=invalid`);
   }
   await setSession(user.id);
+  await mergeGuestCartIntoUser(user.id);
   redirect(`/${locale}/account`);
 }
 
@@ -41,6 +43,7 @@ export async function registerAction(formData: FormData) {
   try {
     const user = await userRepository.register({ email, password, displayName });
     await setSession(user.id);
+    await mergeGuestCartIntoUser(user.id);
   } catch {
     redirect(`/${locale}/account/register?error=taken`);
   }

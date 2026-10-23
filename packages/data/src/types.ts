@@ -106,7 +106,20 @@ export type Cart = {
   totalUzs: number;
 };
 
-export type OrderStatus = "pending" | "confirmed" | "cancelled";
+export type OrderStatus = "pending" | "confirmed" | "shipped" | "delivered" | "cancelled";
+
+export type OrderAddress = {
+  recipient: string;
+  phone: string;
+  city: string;
+  street: string;
+};
+
+export type OrderEvent = {
+  at: string;
+  status: OrderStatus;
+  note: string;
+};
 
 export type Order = {
   id: string;
@@ -114,8 +127,12 @@ export type Order = {
   userId: string | null;
   contact: string;
   status: OrderStatus;
+  paymentMethod: "cod_demo";
   totalUzs: number;
+  address: OrderAddress | null;
   items: CartItem[];
+  events: OrderEvent[];
+  idempotencyKey: string | null;
 };
 
 export type DemoUser = {

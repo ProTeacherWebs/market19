@@ -6,7 +6,9 @@ coverage
 *.log
 *.tsbuildinfo
 .vercel
+.cursor
 apps
 .env
 .env.*
 !.env.example
+WEB_README.md

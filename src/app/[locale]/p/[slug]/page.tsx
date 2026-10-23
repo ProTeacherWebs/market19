@@ -4,11 +4,14 @@ import { notFound } from "next/navigation";
 import { catalogRepository } from "@market/data";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { CompareToggle } from "@/components/compare-toggle";
+import { JsonLd } from "@/components/json-ld";
 import { Badge } from "@/components/ui";
 import { Link } from "@/i18n/navigation";
 import { toggleFavoriteAction } from "@/lib/auth-actions";
+import { addToCartAction } from "@/lib/cart-actions";
 import { formatUzs } from "@/lib/format";
 import { getSessionUser } from "@/lib/session";
+import { userRepository } from "@market/data";
 
 export default async function ProductPage({
   params,
@@ -23,9 +26,28 @@ export default async function ProductPage({
   if (!product) notFound();
   const category = await catalogRepository.getCategory(locale as "ru" | "en", product.categorySlug);
   const user = await getSessionUser();
+  const favoriteSlugs = user ? await userRepository.listFavorites(user.id) : [];
+  const isFavorite = favoriteSlugs.includes(product.slug);
+  const defaultVariant = product.variants[0];
 
   return (
     <article className="grid gap-8 py-8">
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "Product",
+          name: product.title,
+          description: product.description,
+          image: product.image,
+          brand: product.brandName,
+          offers: {
+            "@type": "Offer",
+            priceCurrency: "UZS",
+            price: product.priceUzs,
+            availability: product.stockQuantity > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+          },
+        }}
+      />
       <Breadcrumbs
         items={[
           { href: "/", label: tNav("home") },
@@ -92,6 +114,28 @@ export default async function ProductPage({
           </section>
           <p className="text-sm text-muted">{t("delivery")}</p>
           <p className="text-sm text-muted">{t("warranty")}</p>
+          {defaultVariant && product.stockQuantity > 0 ? (
+            <form action={addToCartAction} className="flex flex-wrap items-end gap-3">
+              <input type="hidden" name="locale" value={locale} />
+              <label className="grid gap-2 text-sm text-muted">
+                {t("variants")}
+                <select className="field min-w-[12rem]" name="variantId" defaultValue={defaultVariant.id}>
+                  {product.variants.map((variant) => (
+                    <option key={variant.id} value={variant.id} disabled={variant.stockQuantity <= 0}>
+                      {variant.label} - {formatUzs(locale, variant.priceUzs)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="grid gap-2 text-sm text-muted">
+                {t("qty")}
+                <input className="field w-24" type="number" name="quantity" min={1} defaultValue={1} />
+              </label>
+              <button type="submit" className="btn">
+                {t("addToCart")}
+              </button>
+            </form>
+          ) : null}
           <div className="flex flex-wrap gap-3">
             <CompareToggle slug={product.slug} categorySlug={product.categorySlug} />
             {user ? (
@@ -100,7 +144,7 @@ export default async function ProductPage({
                 <input type="hidden" name="slug" value={product.slug} />
                 <input type="hidden" name="back" value={`/${locale}/p/${product.slug}`} />
                 <button type="submit" className="btn btn-ghost">
-                  {t("favorite")}
+                  {isFavorite ? t("favoriteOn") : t("favorite")}
                 </button>
               </form>
             ) : (

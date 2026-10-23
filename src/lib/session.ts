@@ -16,3 +16,9 @@ export async function requireSessionUser(): Promise<ProfileView> {
   if (!user) throw new Error("UNAUTHORIZED");
   return user;
 }
+
+export async function requireAdminUser(): Promise<ProfileView> {
+  const user = await getSessionUser();
+  if (!user || user.role !== "admin") throw new Error("FORBIDDEN");
+  return user;
+}

@@ -1,11 +1,14 @@
 import type { Locale, ProductQuery } from "@market/contracts";
 import { brands, categories, cloneProducts, promos } from "./seed";
-import type { Address, AuthUser, Product } from "./types";
+import type { Address, AuthUser, OrderStatus, Product } from "./types";
 import type {
+  AdminProductInput,
+  AdminRepository,
   Cart,
   CartItem,
   CatalogRepository,
   CategoryView,
+  CreateOrderInput,
   DemoUser,
   Order,
   OrderRepository,
@@ -321,10 +324,34 @@ export const cartRepository = {
   async remove(ownerKey: string, variantId: string) {
     return this.setQuantity(ownerKey, variantId, 0);
   },
+  async merge(fromKey: string, toKey: string) {
+    if (fromKey === toKey) return readCart(toKey);
+    const from = carts.get(fromKey);
+    if (!from || from.size === 0) return readCart(toKey);
+    const to = carts.get(toKey) ?? new Map<string, number>();
+    for (const [variantId, quantity] of from) {
+      to.set(variantId, (to.get(variantId) ?? 0) + quantity);
+    }
+    carts.set(toKey, to);
+    carts.delete(fromKey);
+    return readCart(toKey);
+  },
+};
+
+const allowedTransitions: Record<OrderStatus, OrderStatus[]> = {
+  pending: ["confirmed", "cancelled"],
+  confirmed: ["shipped", "cancelled"],
+  shipped: ["delivered", "cancelled"],
+  delivered: [],
+  cancelled: [],
 };
 
 export const orderRepository: OrderRepository = {
-  async create(input) {
+  async create(input: CreateOrderInput) {
+    if (input.idempotencyKey) {
+      const existing = orders.find((order) => order.idempotencyKey === input.idempotencyKey);
+      if (existing) return structuredClone(existing);
+    }
     const cart = readCart(input.ownerKey);
     if (cart.items.length === 0) throw new Error("EMPTY_CART");
     for (const item of cart.items) {
@@ -332,29 +359,150 @@ export const orderRepository: OrderRepository = {
       if (!found || found.product.status !== "published") throw new Error("UNKNOWN_VARIANT");
       if (found.variant.stockQuantity < item.quantity) throw new Error("OUT_OF_STOCK");
     }
-    for (const item of cart.items) {
+    const pricedItems = cart.items.map((item) => {
+      const found = findVariant(item.variantId)!;
+      return {
+        variantId: item.variantId,
+        sku: found.variant.sku,
+        title: item.title,
+        unitPriceUzs: found.variant.priceUzs,
+        quantity: item.quantity,
+        lineTotalUzs: found.variant.priceUzs * item.quantity,
+      };
+    });
+    for (const item of pricedItems) {
       const found = findVariant(item.variantId);
       if (found) found.variant.stockQuantity -= item.quantity;
     }
+    const now = new Date().toISOString();
     const order: Order = {
       id: `order-${orderSeq}`,
       number: `VL-${orderSeq}`,
       userId: input.userId,
       contact: input.contact,
       status: "pending",
-      totalUzs: cart.totalUzs,
-      items: cart.items.map((item) => ({ ...item })),
+      paymentMethod: input.paymentMethod ?? "cod_demo",
+      totalUzs: pricedItems.reduce((sum, item) => sum + item.lineTotalUzs, 0),
+      address: input.address ? { ...input.address } : null,
+      items: pricedItems,
+      events: [{ at: now, status: "pending", note: "created" }],
+      idempotencyKey: input.idempotencyKey ?? null,
     };
     orderSeq += 1;
     orders.push(order);
     carts.delete(input.ownerKey);
-    return order;
+    return structuredClone(order);
   },
   async listByUser(userId) {
-    return orders.filter((order) => order.userId === userId);
+    return orders.filter((order) => order.userId === userId).map((order) => structuredClone(order));
   },
   async getForUser(userId, orderId) {
-    return orders.find((order) => order.id === orderId && order.userId === userId) ?? null;
+    const order = orders.find((entry) => entry.id === orderId && entry.userId === userId);
+    return order ? structuredClone(order) : null;
+  },
+  async listAll() {
+    return orders.map((order) => structuredClone(order));
+  },
+  async getById(orderId) {
+    const order = orders.find((entry) => entry.id === orderId);
+    return order ? structuredClone(order) : null;
+  },
+  async updateStatus(orderId, status, note = "") {
+    const order = orders.find((entry) => entry.id === orderId);
+    if (!order) throw new Error("ORDER_NOT_FOUND");
+    if (!allowedTransitions[order.status].includes(status)) throw new Error("INVALID_STATUS");
+    order.status = status;
+    order.events.push({ at: new Date().toISOString(), status, note: note || status });
+    return structuredClone(order);
+  },
+};
+
+export const adminRepository: AdminRepository = {
+  async listProducts() {
+    return catalogProducts.map((product) => toDetail(product, "ru"));
+  },
+  async setProductStatus(slug, status) {
+    const product = catalogProducts.find((entry) => entry.slug === slug);
+    if (!product) throw new Error("NOT_FOUND");
+    product.status = status;
+  },
+  async setVariantStock(variantId, stockQuantity) {
+    const found = findVariant(variantId);
+    if (!found) throw new Error("NOT_FOUND");
+    found.variant.stockQuantity = Math.max(0, stockQuantity);
+  },
+  async upsertProduct(input: AdminProductInput) {
+    let product = catalogProducts.find((entry) => entry.slug === input.slug);
+    if (!product) {
+      product = {
+        id: `prod-${input.slug}`,
+        slug: input.slug,
+        brandId: input.brandId,
+        categoryId: input.categoryId,
+        status: input.status,
+        featured: input.featured,
+        image: input.image,
+        translations: {
+          ru: { title: input.titleRu, description: input.descriptionRu },
+          en: { title: input.titleEn, description: input.descriptionEn },
+        },
+        specs: [
+          {
+            label: { ru: "Тип", en: "Type" },
+            value: { ru: "Демо", en: "Demo" },
+          },
+        ],
+        variants: [
+          {
+            id: `${input.slug}-base`,
+            sku: `${input.slug.toUpperCase()}-BASE`,
+            label: { ru: "Базовая", en: "Base" },
+            priceUzs: input.priceUzs,
+            stockQuantity: input.stockQuantity,
+          },
+        ],
+      };
+      catalogProducts.push(product);
+    } else {
+      product.brandId = input.brandId;
+      product.categoryId = input.categoryId;
+      product.status = input.status;
+      product.featured = input.featured;
+      product.image = input.image;
+      product.translations.ru = { title: input.titleRu, description: input.descriptionRu };
+      product.translations.en = { title: input.titleEn, description: input.descriptionEn };
+      const variant = product.variants[0];
+      if (variant) {
+        variant.priceUzs = input.priceUzs;
+        variant.stockQuantity = input.stockQuantity;
+      }
+    }
+    return toDetail(product, "ru");
+  },
+  async listPromos(locale) {
+    return catalogRepository.listPromos(locale);
+  },
+  async updatePromo(id, patch) {
+    const promo = promos.find((entry) => entry.id === id);
+    if (!promo) throw new Error("NOT_FOUND");
+    if (patch.href) promo.href = patch.href;
+    if (patch.image) promo.image = patch.image;
+    if (patch.problem) {
+      promo.problem.ru = patch.problem;
+      promo.problem.en = patch.problem;
+    }
+    if (patch.agitate) {
+      promo.agitate.ru = patch.agitate;
+      promo.agitate.en = patch.agitate;
+    }
+    if (patch.solution) {
+      promo.solution.ru = patch.solution;
+      promo.solution.en = patch.solution;
+    }
+    if (patch.cta) {
+      promo.cta.ru = patch.cta;
+      promo.cta.en = patch.cta;
+    }
   },
 };
 

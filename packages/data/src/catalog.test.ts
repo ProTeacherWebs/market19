@@ -1,5 +1,6 @@
 import { describe, expect, it, beforeEach } from "vitest";
 import {
+  adminRepository,
   cartRepository,
   catalogRepository,
   orderRepository,
@@ -73,5 +74,46 @@ describe("catalog mock", () => {
     await userRepository.toggleFavorite(buyer!.id, "nordline-s9");
     expect(await userRepository.listFavorites(admin!.id)).toEqual([]);
     expect(await userRepository.listFavorites(buyer!.id)).toEqual(["nordline-s9"]);
+  });
+
+  it("merges guest cart into the user cart after login", async () => {
+    await cartRepository.add("guest-merge", "nordline-s9-128", 1);
+    await cartRepository.add("user-customer", "nordline-kettle-base", 1);
+    const merged = await cartRepository.merge("guest-merge", "user-customer");
+    expect(merged.items).toHaveLength(2);
+    expect((await cartRepository.get("guest-merge")).items).toHaveLength(0);
+  });
+
+  it("reprices from catalog and returns the same order for a repeated idempotency key", async () => {
+    await cartRepository.add("guest-price", "nordline-s9-128", 1);
+    const first = await orderRepository.create({
+      ownerKey: "guest-price",
+      userId: "user-customer",
+      contact: "buyer@velin.demo",
+      idempotencyKey: "idem-1",
+    });
+    expect(first.items[0]?.unitPriceUzs).toBe(12_490_000);
+    await cartRepository.add("guest-price", "nordline-s9-128", 1);
+    const second = await orderRepository.create({
+      ownerKey: "guest-price",
+      userId: "user-customer",
+      contact: "buyer@velin.demo",
+      idempotencyKey: "idem-1",
+    });
+    expect(second.id).toBe(first.id);
+  });
+
+  it("lets admin change order status and blocks invalid transitions", async () => {
+    await cartRepository.add("guest-admin-order", "nordline-kettle-base", 1);
+    const order = await orderRepository.create({
+      ownerKey: "guest-admin-order",
+      userId: "user-customer",
+      contact: "buyer@velin.demo",
+    });
+    const confirmed = await orderRepository.updateStatus(order.id, "confirmed", "ok");
+    expect(confirmed.status).toBe("confirmed");
+    await expect(orderRepository.updateStatus(order.id, "pending")).rejects.toThrow("INVALID_STATUS");
+    await adminRepository.setProductStatus("arca-band", "published");
+    expect(await catalogRepository.getBySlug("ru", "arca-band")).not.toBeNull();
   });
 });

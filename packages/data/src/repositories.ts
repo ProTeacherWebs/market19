@@ -20,6 +20,8 @@ export type {
   CategoryView,
   DemoUser,
   Order,
+  OrderAddress,
+  OrderEvent,
   OrderStatus,
   ProductCard,
   ProductDetail,
@@ -70,12 +72,54 @@ export interface CartRepository {
   add(ownerKey: string, variantId: string, quantity: number): Promise<Cart>;
   setQuantity(ownerKey: string, variantId: string, quantity: number): Promise<Cart>;
   remove(ownerKey: string, variantId: string): Promise<Cart>;
+  merge(fromKey: string, toKey: string): Promise<Cart>;
 }
 
+export type CreateOrderInput = {
+  ownerKey: string;
+  userId: string | null;
+  contact: string;
+  address?: {
+    recipient: string;
+    phone: string;
+    city: string;
+    street: string;
+  };
+  paymentMethod?: "cod_demo";
+  idempotencyKey?: string;
+};
+
 export interface OrderRepository {
-  create(input: { ownerKey: string; userId: string | null; contact: string }): Promise<Order>;
+  create(input: CreateOrderInput): Promise<Order>;
   listByUser(userId: string): Promise<Order[]>;
   getForUser(userId: string, orderId: string): Promise<Order | null>;
+  listAll(): Promise<Order[]>;
+  getById(orderId: string): Promise<Order | null>;
+  updateStatus(orderId: string, status: Order["status"], note?: string): Promise<Order>;
+}
+
+export type AdminProductInput = {
+  slug: string;
+  brandId: string;
+  categoryId: string;
+  titleRu: string;
+  titleEn: string;
+  descriptionRu: string;
+  descriptionEn: string;
+  priceUzs: number;
+  stockQuantity: number;
+  status: "draft" | "published";
+  featured: boolean;
+  image: string;
+};
+
+export interface AdminRepository {
+  listProducts(): Promise<ProductDetail[]>;
+  setProductStatus(slug: string, status: "draft" | "published"): Promise<void>;
+  setVariantStock(variantId: string, stockQuantity: number): Promise<void>;
+  upsertProduct(input: AdminProductInput): Promise<ProductDetail>;
+  listPromos(locale: Locale): Promise<PromoView[]>;
+  updatePromo(id: string, patch: Partial<PromoView> & { id: string }): Promise<void>;
 }
 
 export interface UserRepository {
