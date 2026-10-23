@@ -10,7 +10,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@market/contracts": "file:../contracts"
+    "@market/contracts": "*"
   },
   "devDependencies": {
     "typescript": "^5.9.3",

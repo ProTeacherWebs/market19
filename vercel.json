@@ -1,5 +1,6 @@
 {
+  "rootDirectory": "apps/web",
   "framework": "nextjs",
-  "installCommand": "npm install",
-  "buildCommand": "npm run build -w @market/web"
+  "installCommand": "npm install --prefix ../..",
+  "buildCommand": "npm run build"
 }
