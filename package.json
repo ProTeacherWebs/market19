@@ -1,0 +1,14 @@
+{
+  "name": "market",
+  "private": true,
+  "scripts": {
+    "dev": "npm run dev --prefix apps/web",
+    "build": "npm run build --prefix apps/web",
+    "lint": "npm run lint --prefix apps/web",
+    "test": "npm test --prefix packages/data",
+    "format": "prettier --write \"apps/web/src/**/*.{ts,tsx,css}\" \"packages/**/*.ts\""
+  },
+  "devDependencies": {
+    "prettier": "^3.6.2"
+  }
+}
