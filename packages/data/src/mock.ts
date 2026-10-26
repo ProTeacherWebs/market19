@@ -537,6 +537,28 @@ export const userRepository: UserRepository = {
     users.push(user);
     return user;
   },
+  async restore(incoming) {
+    const email = incoming.email.trim().toLocaleLowerCase();
+    const apply = (target: AuthUser) => {
+      target.email = email;
+      target.displayName = incoming.displayName;
+      target.role = incoming.role;
+      target.phone = incoming.phone;
+      target.avatarPath = incoming.avatarPath;
+      target.emailVerified = incoming.emailVerified;
+      if (incoming.password && incoming.password !== "!") {
+        target.password = incoming.password;
+      }
+      return target;
+    };
+    const byId = users.find((entry) => entry.id === incoming.id);
+    if (byId) return apply(byId);
+    const byEmail = users.find((entry) => entry.email === email);
+    if (byEmail) return apply(byEmail);
+    const user: AuthUser = { ...incoming, email, password: incoming.password || "!" };
+    users.push(user);
+    return user;
+  },
   async updateProfile(userId, patch) {
     const user = users.find((entry) => entry.id === userId);
     if (!user) throw new Error("NOT_FOUND");

@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { cartRepository } from "@market/data";
-import { SESSION_COOKIE, getSessionUser } from "./session";
+import { getSessionUser } from "./session";
 
 export const GUEST_COOKIE = "velin_guest";
 
@@ -34,10 +34,10 @@ export async function mergeGuestCartIntoUser(userId: string) {
 }
 
 export async function getCartItemCount(): Promise<number> {
+  const user = await getSessionUser();
   const store = await cookies();
-  const userId = store.get(SESSION_COOKIE)?.value;
   const guestId = store.get(GUEST_COOKIE)?.value;
-  const ownerKey = userId ?? guestId;
+  const ownerKey = user?.id ?? guestId;
   if (!ownerKey) return 0;
   const cart = await cartRepository.get(ownerKey);
   return cart.items.reduce((sum, item) => sum + item.quantity, 0);

@@ -26,10 +26,6 @@ export default async function ResetPage({
           <span>{t("email")}</span>
           <input className="field" name="email" type="email" required />
         </label>
-        <label className="grid gap-2 text-sm text-muted">
-          <span>{t("newPassword")}</span>
-          <input className="field" name="password" type="password" required minLength={6} />
-        </label>
         <button type="submit" className="btn">
           {t("reset")}
         </button>

@@ -19,7 +19,7 @@ npm run dev
 Демо-вход: `buyer@velin.demo` / `demo1234`  
 Админ: `admin@velin.demo` / `admin1234`
 
-Google: задайте `GOOGLE_CLIENT_ID` и `GOOGLE_CLIENT_SECRET` в `.env.local`, redirect URI — `{NEXT_PUBLIC_SITE_URL}/api/auth/google/callback`.
+Google: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `AUTH_SECRET` в `.env.local` и в Vercel Env. Redirect URI — `{NEXT_PUBLIC_SITE_URL}/api/auth/google/callback`. Сессия подписана cookie (без Neon вход не теряется на cold start); заказы/корзина в моках по-прежнему эфемерны.
 
 ## Скрипты
 
@@ -27,7 +27,21 @@ Google: задайте `GOOGLE_CLIENT_ID` и `GOOGLE_CLIENT_SECRET` в `.env.loc
 
 ## Neon
 
-Пока сайт на моках. Для Neon: `DATABASE_URL` в `.env.local` (не в git) и шаги из `db/README.md`.
+Проект связан через `neon.ts` / `.neon` (branch `production`).
+
+```bash
+neon deploy          # postgres, auth, object-storage, functions
+npm run db:migrate
+npm run db:seed
+```
+
+Проверка сервисов: `GET /api/health/neon`.
+
+- `DATA_SOURCE=mock` — витрина/корзина на моках (по умолчанию)
+- `DATA_SOURCE=neon` — каталог читает Postgres
+- Auth: Neon Managed Better Auth (`/api/auth/[...path]`), Google через shared provider
+- Storage bucket `assets` — загрузка аватара в профиле
+- Function `hello` — `NEON_FUNCTION_HELLO_BASE_URL`
 
 ## Деплой
 

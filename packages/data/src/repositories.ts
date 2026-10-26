@@ -132,6 +132,8 @@ export interface UserRepository {
     password: string;
     displayName: string;
   }): Promise<AuthUser>;
+  /** Upsert into in-memory store (survives serverless cold start via signed session). */
+  restore(user: AuthUser): Promise<AuthUser>;
   updateProfile(
     userId: string,
     patch: Partial<Pick<AuthUser, "displayName" | "phone" | "avatarPath" | "password" | "emailVerified">>,

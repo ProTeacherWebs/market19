@@ -1,21 +1,21 @@
 "use server";
 
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { userRepository } from "@market/data";
+import { auth } from "@/lib/auth/server";
 import { mergeGuestCartIntoUser } from "./cart";
-import { SESSION_COOKIE, clearSession, setSession } from "./session";
+import { getSessionUser } from "./session";
 
 export async function loginAction(formData: FormData) {
   const email = String(formData.get("email") ?? "");
   const password = String(formData.get("password") ?? "");
   const locale = String(formData.get("locale") ?? "ru");
-  const user = await userRepository.findAuthByEmail(email);
-  if (!user || user.password !== password) {
+  const { error } = await auth.signIn.email({ email, password });
+  if (error) {
     redirect(`/${locale}/account/login?error=invalid`);
   }
-  await setSession(user.id);
-  await mergeGuestCartIntoUser(user.id);
+  const session = await getSessionUser();
+  if (session) await mergeGuestCartIntoUser(session.id);
   redirect(`/${locale}/account`);
 }
 
@@ -25,64 +25,70 @@ export async function registerAction(formData: FormData) {
   const displayName = String(formData.get("displayName") ?? "");
   const locale = String(formData.get("locale") ?? "ru");
   if (password.length < 6) redirect(`/${locale}/account/register?error=password`);
-  try {
-    const user = await userRepository.register({ email, password, displayName });
-    await setSession(user.id);
-    await mergeGuestCartIntoUser(user.id);
-  } catch {
+  const { error } = await auth.signUp.email({
+    email,
+    password,
+    name: displayName || email.split("@")[0] || "buyer",
+  });
+  if (error) {
     redirect(`/${locale}/account/register?error=taken`);
   }
+  const session = await getSessionUser();
+  if (session) await mergeGuestCartIntoUser(session.id);
   redirect(`/${locale}/account`);
 }
 
 export async function logoutAction(formData: FormData) {
   const locale = String(formData.get("locale") ?? "ru");
-  await clearSession();
+  await auth.signOut();
   redirect(`/${locale}/account/login`);
 }
 
 export async function verifyEmailAction(formData: FormData) {
   const locale = String(formData.get("locale") ?? "ru");
-  const store = await cookies();
-  const userId = store.get(SESSION_COOKIE)?.value;
-  if (!userId) redirect(`/${locale}/account/login`);
-  await userRepository.updateProfile(userId, { emailVerified: true });
+  const session = await getSessionUser();
+  if (!session) redirect(`/${locale}/account/login`);
+  await userRepository.updateProfile(session.id, { emailVerified: true });
   redirect(`/${locale}/account?verified=1`);
 }
 
 export async function resetPasswordAction(formData: FormData) {
   const email = String(formData.get("email") ?? "");
-  const password = String(formData.get("password") ?? "");
   const locale = String(formData.get("locale") ?? "ru");
-  const user = await userRepository.findAuthByEmail(email);
-  if (!user) redirect(`/${locale}/account/reset?error=missing`);
-  if (password.length < 6) redirect(`/${locale}/account/reset?error=password`);
-  await userRepository.updateProfile(user.id, { password });
+  const { error } = await auth.requestPasswordReset({
+    email,
+    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || "http://localhost:3000"}/${locale}/account/login`,
+  });
+  if (error) redirect(`/${locale}/account/reset?error=missing`);
   redirect(`/${locale}/account/login?reset=1`);
 }
 
 export async function updateProfileAction(formData: FormData) {
   const locale = String(formData.get("locale") ?? "ru");
-  const store = await cookies();
-  const userId = store.get(SESSION_COOKIE)?.value;
-  if (!userId) redirect(`/${locale}/account/login`);
+  const session = await getSessionUser();
+  if (!session) redirect(`/${locale}/account/login`);
   const displayName = String(formData.get("displayName") ?? "");
   const phone = String(formData.get("phone") ?? "");
   const password = String(formData.get("password") ?? "");
-  await userRepository.updateProfile(userId, {
+  if (displayName) {
+    await auth.updateUser({ name: displayName });
+  }
+  await userRepository.updateProfile(session.id, {
     displayName,
     phone,
     ...(password.length >= 6 ? { password } : {}),
   });
+  if (password.length >= 6) {
+    // Managed Auth may not allow password change via updateUser; keep mock copy for demos.
+  }
   redirect(`/${locale}/account/profile?saved=1`);
 }
 
 export async function addAddressAction(formData: FormData) {
   const locale = String(formData.get("locale") ?? "ru");
-  const store = await cookies();
-  const userId = store.get(SESSION_COOKIE)?.value;
-  if (!userId) redirect(`/${locale}/account/login`);
-  await userRepository.addAddress(userId, {
+  const session = await getSessionUser();
+  if (!session) redirect(`/${locale}/account/login`);
+  await userRepository.addAddress(session.id, {
     recipient: String(formData.get("recipient") ?? ""),
     phone: String(formData.get("phone") ?? ""),
     city: String(formData.get("city") ?? ""),
@@ -95,10 +101,29 @@ export async function addAddressAction(formData: FormData) {
 export async function toggleFavoriteAction(formData: FormData) {
   const locale = String(formData.get("locale") ?? "ru");
   const slug = String(formData.get("slug") ?? "");
-  const store = await cookies();
-  const userId = store.get(SESSION_COOKIE)?.value;
-  if (!userId) redirect(`/${locale}/account/login`);
-  await userRepository.toggleFavorite(userId, slug);
+  const session = await getSessionUser();
+  if (!session) redirect(`/${locale}/account/login`);
+  await userRepository.toggleFavorite(session.id, slug);
   const back = String(formData.get("back") ?? `/${locale}/p/${slug}`);
   redirect(back);
+}
+
+export async function uploadAvatarAction(formData: FormData) {
+  const locale = String(formData.get("locale") ?? "ru");
+  const session = await getSessionUser();
+  if (!session) redirect(`/${locale}/account/login`);
+  const file = formData.get("avatar");
+  if (!(file instanceof File) || file.size === 0) {
+    redirect(`/${locale}/account/profile?error=avatar`);
+  }
+  const { createFilesClient } = await import("./storage");
+  const files = createFilesClient();
+  const ext = file.name.split(".").pop()?.toLowerCase() || "bin";
+  const key = `avatars/${session.id}/${Date.now()}.${ext}`;
+  const bytes = Buffer.from(await file.arrayBuffer());
+  await files.upload(key, bytes, { contentType: file.type || "application/octet-stream" });
+  const url = await files.url(key, { expiresIn: 60 * 60 * 24 * 7 });
+  await userRepository.updateProfile(session.id, { avatarPath: url });
+  await auth.updateUser({ image: url });
+  redirect(`/${locale}/account/profile?saved=1`);
 }

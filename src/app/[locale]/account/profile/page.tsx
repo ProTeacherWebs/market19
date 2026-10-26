@@ -1,7 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { AccountNav } from "@/components/account-nav";
-import { updateProfileAction, verifyEmailAction } from "@/lib/auth-actions";
+import { updateProfileAction, uploadAvatarAction, verifyEmailAction } from "@/lib/auth-actions";
 import { getSessionUser } from "@/lib/session";
 
 export default async function ProfilePage({
@@ -24,11 +24,23 @@ export default async function ProfilePage({
       <AccountNav locale={locale} />
       {saved ? <p className="text-success">{t("saved")}</p> : null}
       <div className="flex items-center gap-4">
-        <div className="flex h-20 w-20 items-center justify-center rounded-full border border-line bg-surface text-2xl">
-          {user.displayName.slice(0, 1).toUpperCase()}
+        <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-full border border-line bg-surface text-2xl">
+          {user.avatarPath ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={user.avatarPath} alt="" className="h-full w-full object-cover" />
+          ) : (
+            user.displayName.slice(0, 1).toUpperCase()
+          )}
         </div>
         <p className="text-muted">{t("avatarHint")}</p>
       </div>
+      <form action={uploadAvatarAction} className="grid max-w-md gap-3" encType="multipart/form-data">
+        <input type="hidden" name="locale" value={locale} />
+        <input className="field" name="avatar" type="file" accept="image/*" required />
+        <button type="submit" className="btn btn-ghost w-fit">
+          Upload avatar
+        </button>
+      </form>
       <form action={updateProfileAction} className="grid max-w-md gap-4">
         <input type="hidden" name="locale" value={locale} />
         <label className="grid gap-2 text-sm text-muted">

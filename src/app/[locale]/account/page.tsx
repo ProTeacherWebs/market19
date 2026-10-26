@@ -1,6 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { AccountNav } from "@/components/account-nav";
+import { mergeGuestCartIntoUser } from "@/lib/cart";
 import { getSessionUser } from "@/lib/session";
 import { Link } from "@/i18n/navigation";
 
@@ -16,6 +17,7 @@ export default async function AccountPage({
   setRequestLocale(locale);
   const user = await getSessionUser();
   if (!user) redirect(`/${locale}/account/login`);
+  await mergeGuestCartIntoUser(user.id);
   const t = await getTranslations("account");
 
   return (
