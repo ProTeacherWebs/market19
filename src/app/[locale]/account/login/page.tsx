@@ -2,6 +2,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 import { loginAction } from "@/lib/auth-actions";
+import { isGoogleOAuthConfigured } from "@/lib/google-oauth";
 import { getSessionUser } from "@/lib/session";
 
 export default async function LoginPage({
@@ -16,11 +17,14 @@ export default async function LoginPage({
   setRequestLocale(locale);
   if (await getSessionUser()) redirect(`/${locale}/account`);
   const t = await getTranslations("auth");
+  const googleReady = isGoogleOAuthConfigured();
 
   return (
     <div className="mx-auto grid max-w-md gap-6">
       <h1 className="page-title">{t("loginTitle")}</h1>
       {error === "invalid" ? <p className="text-danger">{t("invalid")}</p> : null}
+      {error === "google" ? <p className="text-danger">{t("googleError")}</p> : null}
+      {error === "google_config" ? <p className="text-danger">{t("googleConfig")}</p> : null}
       {reset ? <p className="text-success">{t("resetOk")}</p> : null}
       <form action={loginAction} className="grid gap-4">
         <input type="hidden" name="locale" value={locale} />
@@ -36,10 +40,18 @@ export default async function LoginPage({
           {t("login")}
         </button>
       </form>
-      <button type="button" className="btn btn-ghost" disabled title={t("googleHint")}>
-        {t("google")}
-      </button>
-      <p className="text-sm text-muted">{t("googleHint")}</p>
+      {googleReady ? (
+        <a className="btn btn-ghost text-center" href={`/api/auth/google?locale=${locale}`}>
+          {t("google")}
+        </a>
+      ) : (
+        <>
+          <button type="button" className="btn btn-ghost" disabled title={t("googleHint")}>
+            {t("google")}
+          </button>
+          <p className="text-sm text-muted">{t("googleHint")}</p>
+        </>
+      )}
       <div className="flex flex-wrap gap-4 text-sm">
         <Link href="/account/register">{t("toRegister")}</Link>
         <Link href="/account/reset">{t("toReset")}</Link>

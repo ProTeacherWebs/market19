@@ -3,6 +3,21 @@ import { userRepository, type ProfileView } from "@market/data";
 
 export const SESSION_COOKIE = "velin_session";
 
+export async function setSession(userId: string) {
+  const store = await cookies();
+  store.set(SESSION_COOKIE, userId, {
+    httpOnly: true,
+    sameSite: "lax",
+    path: "/",
+    secure: process.env.NODE_ENV === "production",
+  });
+}
+
+export async function clearSession() {
+  const store = await cookies();
+  store.delete(SESSION_COOKIE);
+}
+
 export async function getSessionUser(): Promise<ProfileView | null> {
   const store = await cookies();
   const userId = store.get(SESSION_COOKIE)?.value;

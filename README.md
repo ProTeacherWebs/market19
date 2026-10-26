@@ -19,6 +19,8 @@ npm run dev
 Демо-вход: `buyer@velin.demo` / `demo1234`  
 Админ: `admin@velin.demo` / `admin1234`
 
+Google: задайте `GOOGLE_CLIENT_ID` и `GOOGLE_CLIENT_SECRET` в `.env.local`, redirect URI — `{NEXT_PUBLIC_SITE_URL}/api/auth/google/callback`.
+
 ## Скрипты
 
 - `npm run dev` / `npm run build` / `npm test`

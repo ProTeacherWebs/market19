@@ -4,22 +4,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { userRepository } from "@market/data";
 import { mergeGuestCartIntoUser } from "./cart";
-import { SESSION_COOKIE } from "./session";
-
-async function setSession(userId: string) {
-  const store = await cookies();
-  store.set(SESSION_COOKIE, userId, {
-    httpOnly: true,
-    sameSite: "lax",
-    path: "/",
-    secure: process.env.NODE_ENV === "production",
-  });
-}
-
-async function clearSession() {
-  const store = await cookies();
-  store.delete(SESSION_COOKIE);
-}
+import { SESSION_COOKIE, clearSession, setSession } from "./session";
 
 export async function loginAction(formData: FormData) {
   const email = String(formData.get("email") ?? "");

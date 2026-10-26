@@ -12,3 +12,6 @@ apps
 .env.*
 !.env.example
 WEB_README.md
+
+.vercel
+.env*
