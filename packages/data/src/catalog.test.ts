@@ -1,4 +1,7 @@
 import { describe, expect, it, beforeEach } from "vitest";
+
+process.env.DATA_SOURCE = "mock";
+
 import {
   adminRepository,
   cartRepository,
@@ -9,6 +12,7 @@ import {
 } from "./index";
 
 beforeEach(() => {
+  process.env.DATA_SOURCE = "mock";
   resetMocks();
 });
 

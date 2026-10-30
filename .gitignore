@@ -7,7 +7,10 @@ coverage
 *.tsbuildinfo
 .vercel
 .cursor
-apps
+apps/telegram/dist
+apps/mobile/.expo
+apps/mobile/dist
+apps/mobile/node_modules
 .env
 .env.*
 !.env.example

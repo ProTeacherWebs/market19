@@ -1,0 +1,26 @@
+{
+  "name": "@market/telegram",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@market/api-client": "*",
+    "@market/contracts": "*",
+    "@market/design-tokens": "*",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "react-router-dom": "^7.9.4"
+  },
+  "devDependencies": {
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^5.0.4",
+    "typescript": "^5",
+    "vite": "^7.1.9"
+  }
+}

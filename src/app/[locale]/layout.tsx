@@ -11,6 +11,8 @@ import { ToastProvider } from "@/components/toast";
 import { getSessionUser } from "@/lib/session";
 import "../globals.css";
 
+export const dynamic = "force-dynamic";
+
 const sans = Geist({
   subsets: ["latin", "cyrillic"],
   variable: "--font-geist",

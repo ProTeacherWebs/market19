@@ -2,6 +2,11 @@ import { parseProductQuery } from "@market/contracts";
 import { catalogRepository } from "@market/data";
 import type { Locale } from "@market/contracts";
 import { apiError } from "@/lib/api-error";
+import { corsPreflight, withCors } from "@/lib/cors";
+
+export async function OPTIONS(request: Request) {
+  return corsPreflight(request);
+}
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
@@ -17,8 +22,8 @@ export async function GET(request: Request) {
     includeDrafts: false,
   });
   if (!parsed.success) {
-    return apiError(400, "INVALID_QUERY", "Проверьте sort, page и pageSize.");
+    return withCors(request, apiError(400, "INVALID_QUERY", "Проверьте sort, page и pageSize."));
   }
   const page = await catalogRepository.listProductsPage(locale, parsed.data);
-  return Response.json({ products: page.items, page });
+  return withCors(request, Response.json({ products: page.items, page }));
 }

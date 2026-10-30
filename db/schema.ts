@@ -228,3 +228,19 @@ export const orderEvents = pgTable("order_events", {
   note: text("note").notNull().default(""),
   at: timestamp("at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+export const telegramIdentities = pgTable(
+  "telegram_identities",
+  {
+    telegramUserId: varchar("telegram_user_id", { length: 40 }).notNull(),
+    profileId: uuid("profile_id")
+      .notNull()
+      .references(() => profiles.id, { onDelete: "cascade" }),
+    username: varchar("username", { length: 120 }),
+    linkedAt: timestamp("linked_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("telegram_identities_tg_unique").on(table.telegramUserId),
+    uniqueIndex("telegram_identities_profile_unique").on(table.profileId),
+  ],
+);

@@ -3,15 +3,20 @@
   "version": "0.1.0",
   "private": true,
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "apps/*"
   ],
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "dev:telegram": "npm run dev -w @market/telegram",
+    "dev:mobile": "npm run start -w @market/mobile",
+    "build": "next build --webpack",
+    "build:telegram": "npm run build -w @market/telegram",
+    "typecheck:mobile": "npm run typecheck -w @market/mobile",
     "start": "next start",
     "lint": "eslint",
     "test": "npm test -w @market/data",
-    "format": "prettier --write \"src/**/*.{ts,tsx,css}\" \"packages/**/*.ts\"",
+    "format": "prettier --write \"src/**/*.{ts,tsx,css}\" \"packages/**/*.ts\" \"apps/telegram/src/**/*.{ts,tsx,css}\"",
     "db:generate": "drizzle-kit generate --config=db/drizzle.config.ts",
     "db:migrate": "drizzle-kit migrate --config=db/drizzle.config.ts",
     "db:seed": "node scripts/seed-neon.mjs"
@@ -20,8 +25,10 @@
     "@aws-sdk/client-s3": "^3.1156.0",
     "@aws-sdk/s3-presigned-post": "^3.1156.0",
     "@aws-sdk/s3-request-presigner": "^3.1156.0",
+    "@market/api-client": "*",
     "@market/contracts": "*",
     "@market/data": "*",
+    "@market/design-tokens": "*",
     "@neon/config": "^1.9.4",
     "@neon/env": "^1.6.5",
     "@neondatabase/auth": "^0.6.0-beta",
@@ -33,13 +40,15 @@
     "next": "16.4.2",
     "next-intl": "^4.4.0",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "ws": "^8.22.0"
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/ws": "^8.18.2",
     "dotenv": "^18.0.9",
     "drizzle-kit": "^0.31.11",
     "eslint": "^9",
