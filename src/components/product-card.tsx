@@ -9,7 +9,7 @@ export async function ProductCard({ product, locale }: { product: ProductCardDat
   const t = await getTranslations("product");
 
   return (
-    <Link href={`/p/${product.slug}`} className="card">
+    <Link href={`/p/${product.slug}`} prefetch={false} className="card">
       <div className="relative aspect-[4/3] bg-raised">
         <Image
           src={product.image}

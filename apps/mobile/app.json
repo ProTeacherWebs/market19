@@ -6,7 +6,6 @@
     "orientation": "portrait",
     "scheme": "velin",
     "userInterfaceStyle": "dark",
-    "newArchEnabled": true,
     "icon": "./assets/icon.png",
     "splash": {
       "image": "./assets/splash-icon.png",
@@ -23,6 +22,8 @@
         "backgroundColor": "#08090b"
       },
       "package": "uz.velin.market",
+      "versionCode": 1,
+      "usesCleartextTraffic": true,
       "intentFilters": [
         {
           "action": "VIEW",
@@ -34,7 +35,10 @@
               "pathPrefix": "/"
             }
           ],
-          "category": ["BROWSABLE", "DEFAULT"]
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         }
       ]
     },
@@ -45,10 +49,11 @@
         {
           "configureAndroidBackup": true
         }
-      ]
+      ],
+      "expo-status-bar"
     ],
     "experiments": {
-      "typedRoutes": true
+      "typedRoutes": false
     }
   }
 }

@@ -19,6 +19,7 @@ export async function FeaturedStrip({
     <section className="featured-strip grid gap-5 lg:grid-cols-12 lg:gap-6">
       <Link
         href={`/p/${lead.slug}`}
+        prefetch={false}
         className="group relative min-h-[22rem] overflow-hidden rounded-[var(--radius)] border border-line bg-surface lg:col-span-7 lg:min-h-[28rem]"
       >
         <Image
@@ -43,6 +44,7 @@ export async function FeaturedStrip({
           <li key={product.slug}>
             <Link
               href={`/p/${product.slug}`}
+              prefetch={false}
               className="grid grid-cols-[5.5rem_1fr] items-center gap-4 p-4 transition-colors hover:bg-raised sm:grid-cols-[6.5rem_1fr]"
             >
               <div className="relative aspect-square overflow-hidden rounded-[var(--radius-control)] bg-raised">

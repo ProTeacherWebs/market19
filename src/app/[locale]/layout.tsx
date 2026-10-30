@@ -24,10 +24,6 @@ const display = Cormorant_Garamond({
   variable: "--font-cormorant",
 });
 
-export function generateStaticParams() {
-  return routing.locales.map((locale) => ({ locale }));
-}
-
 export async function generateMetadata({
   params,
 }: {

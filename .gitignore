@@ -11,6 +11,8 @@ apps/telegram/dist
 apps/mobile/.expo
 apps/mobile/dist
 apps/mobile/node_modules
+brag-output/
+brag-output-*/
 .env
 .env.*
 !.env.example

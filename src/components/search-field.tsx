@@ -70,6 +70,7 @@ export function SearchField({ locale }: { locale: string }) {
             <li key={item.slug} role="option" aria-selected="false">
               <Link
                 href={`/p/${item.slug}`}
+                prefetch={false}
                 className="block min-h-11 rounded-[10px] px-3 py-2 hover:bg-raised"
                 onClick={() => setSuggestions([])}
               >
